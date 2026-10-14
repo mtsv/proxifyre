@@ -116,8 +116,17 @@ namespace ProxiFyre
                     LoggerInstance.Info("LAN bypass enabled - local network traffic will not be proxied.");
             }
 
-            foreach (var appSettings in serviceSettings.Proxies)
+            for (var ruleIndex = 0; ruleIndex < serviceSettings.Proxies.Count; ruleIndex++)
             {
+                var appSettings = serviceSettings.Proxies[ruleIndex];
+                if (!appSettings.Enabled)
+                {
+                    if (_logLevel >= LogLevel.Info)
+                        LoggerInstance.Info(
+                            $"Proxy rule {ruleIndex + 1} ({string.Join(", ", appSettings.AppNames)}) is disabled; skipping.");
+                    continue;
+                }
+
                 var protocolSelection = ConfigurationValueParser.GetProtocols(appSettings.SupportedProtocols);
                 var addressFamilySelection =
                     ConfigurationValueParser.GetAddressFamilies(appSettings.SupportedAddressFamilies);

@@ -49,9 +49,16 @@ namespace ProxiFyre.Configuration
     {
         public ProxyRule()
         {
+            Enabled = true;
             AppNames = new List<string>();
             ExtensionData = new Dictionary<string, JToken>(StringComparer.Ordinal);
         }
+
+        /// <summary>
+        /// Gets or sets whether the service applies this rule. An omitted value means enabled.
+        /// </summary>
+        [JsonProperty("enabled")]
+        public bool Enabled { get; set; }
 
         [JsonProperty("appNames")]
         public List<string> AppNames { get; set; }

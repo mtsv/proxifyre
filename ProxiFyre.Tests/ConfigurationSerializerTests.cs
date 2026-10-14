@@ -91,6 +91,21 @@ namespace ProxiFyre.Tests
             Assert.That(configuration.Proxies[0].SupportedProtocols, Is.Null);
             Assert.That(configuration.Proxies[0].SupportedAddressFamilies, Is.Null);
             Assert.That(configuration.Proxies[0].Socks5Transport, Is.Null);
+            Assert.That(configuration.Proxies[0].Enabled, Is.True);
+        }
+
+        [Test]
+        public void DisabledRuleRoundTripsAndSurvivesCloning()
+        {
+            var configuration = TestModels.ValidConfiguration();
+            configuration.Proxies[0].Enabled = false;
+
+            var json = JObject.Parse(_serializer.Serialize(configuration));
+            var copy = _serializer.Deserialize(json.ToString());
+
+            Assert.That((bool)json["proxies"][0]["enabled"], Is.False);
+            Assert.That(copy.Proxies[0].Enabled, Is.False);
+            Assert.That(_serializer.CloneRule(configuration.Proxies[0]).Enabled, Is.False);
         }
 
         [Test]

@@ -132,6 +132,50 @@ namespace ProxiFyre.Tests
         }
 
         [Test]
+        public void DisabledRulesDoNotParticipateInShadowingChecks()
+        {
+            var disabledCatchAllFirst = TestModels.ValidConfiguration();
+            disabledCatchAllFirst.Proxies[0].AppNames = new List<string> { string.Empty };
+            disabledCatchAllFirst.Proxies[0].Enabled = false;
+            disabledCatchAllFirst.Proxies.Add(TestModels.ValidRule());
+            NoIssueWithPrefix(_validator.Validate(disabledCatchAllFirst), "CATCH_ALL_NOT_LAST");
+
+            var catchAllBeforeDisabled = TestModels.ValidConfiguration();
+            catchAllBeforeDisabled.Proxies[0].AppNames = new List<string> { string.Empty };
+            var trailing = TestModels.ValidRule();
+            trailing.Enabled = false;
+            catchAllBeforeDisabled.Proxies.Add(trailing);
+            NoIssueWithPrefix(_validator.Validate(catchAllBeforeDisabled), "CATCH_ALL_NOT_LAST");
+
+            var disabledOverlap = TestModels.ValidConfiguration();
+            disabledOverlap.Proxies[0].Enabled = false;
+            disabledOverlap.Proxies.Add(TestModels.ValidRule());
+            NoIssueWithPrefix(_validator.Validate(disabledOverlap), "APP_MATCH_SHADOWED");
+        }
+
+        [Test]
+        public void DisabledRulesAreStillValidated()
+        {
+            var configuration = TestModels.ValidConfiguration();
+            configuration.Proxies[0].Enabled = false;
+            configuration.Proxies[0].Socks5ProxyEndpoint = null;
+
+            HasIssue(_validator.Validate(configuration), "ENDPOINT_MISSING", ValidationSeverity.Error);
+        }
+
+        [Test]
+        public void AllRulesDisabledWarns()
+        {
+            var configuration = TestModels.ValidConfiguration();
+            configuration.Proxies[0].Enabled = false;
+
+            var result = _validator.Validate(configuration);
+            HasIssue(result, "ALL_RULES_DISABLED", ValidationSeverity.Warning);
+            Assert.That(result.IsValid, Is.True);
+            NoIssueWithPrefix(_validator.Validate(TestModels.ValidConfiguration()), "ALL_RULES_DISABLED");
+        }
+
+        [Test]
         public void MultipleCatchAllRulesWarn()
         {
             var configuration = TestModels.ValidConfiguration();

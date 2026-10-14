@@ -66,6 +66,15 @@ namespace ProxiFyre.Tests
             Assert.That(_normalizer.NormalizeRule(rule).TlsPinnedSha256, Is.Null);
         }
 
+        [Test]
+        public void NormalizationPreservesDisabledState()
+        {
+            var rule = TestModels.ValidRule();
+            rule.Enabled = false;
+
+            Assert.That(_normalizer.NormalizeRule(rule).Enabled, Is.False);
+        }
+
         [TestCase(null, "TCP")]
         [TestCase("Plain", "TCP")]
         [TestCase("SOCKS5", "TCP")]

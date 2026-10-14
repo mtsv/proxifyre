@@ -192,8 +192,10 @@ namespace ProxiFyreUI.Forms
                     .Select(issue => issue.Message)
                     .Distinct()
                     .ToArray();
+                var enabled = rule?.Enabled ?? true;
                 var rowIndex = routingGrid.Rows.Add(
                     index + 1,
+                    enabled,
                     FormatApplications(rule?.AppNames),
                     rule?.Socks5ProxyEndpoint ?? string.Empty,
                     FormatAuthentication(rule),
@@ -204,6 +206,8 @@ namespace ProxiFyreUI.Forms
                 routingGrid.Rows[rowIndex].Tag = index;
                 if (warnings.Length > 0)
                     routingGrid.Rows[rowIndex].DefaultCellStyle.BackColor = Color.FromArgb(255, 249, 222);
+                if (!enabled)
+                    routingGrid.Rows[rowIndex].DefaultCellStyle.ForeColor = SystemColors.GrayText;
             }
 
             if (selectIndex >= 0 && selectIndex < routingGrid.Rows.Count)
@@ -392,8 +396,31 @@ namespace ProxiFyreUI.Forms
 
         private void RoutingGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (!ConfigurationMutationBlocked && e.RowIndex >= 0)
+            if (!ConfigurationMutationBlocked && e.RowIndex >= 0 && e.ColumnIndex != enabledColumn.Index)
                 EditRuleButton_Click(sender, EventArgs.Empty);
+        }
+
+        private void RoutingGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex != enabledColumn.Index)
+                return;
+            if (routingGrid.Rows[e.RowIndex].Tag is int index)
+                ToggleRuleEnabled(index);
+        }
+
+        private void ToggleRuleEnabled(int index)
+        {
+            if (ConfigurationMutationBlocked)
+                return;
+            var rules = _workspace.Configuration?.Proxies;
+            if (rules == null || index < 0 || index >= rules.Count || rules[index] == null)
+                return;
+            rules[index].Enabled = !rules[index].Enabled;
+            MarkConfigurationChanged();
+            var firstVisibleRow = routingGrid.FirstDisplayedScrollingRowIndex;
+            RefreshRoutingGrid(index);
+            if (firstVisibleRow >= 0 && firstVisibleRow < routingGrid.Rows.Count)
+                routingGrid.FirstDisplayedScrollingRowIndex = firstVisibleRow;
         }
 
         private void RoutingGrid_SelectionChanged(object sender, EventArgs e)
@@ -412,6 +439,12 @@ namespace ProxiFyreUI.Forms
             {
                 RemoveRuleButton_Click(sender, EventArgs.Empty);
                 e.Handled = true;
+            }
+            else if (e.KeyCode == Keys.Space && e.Modifiers == Keys.None)
+            {
+                ToggleRuleEnabled(SelectedRuleIndex);
+                e.Handled = true;
+                e.SuppressKeyPress = true;
             }
             else if (e.Alt && e.KeyCode == Keys.Up)
             {

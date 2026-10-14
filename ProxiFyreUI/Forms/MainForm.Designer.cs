@@ -27,6 +27,7 @@ namespace ProxiFyreUI.Forms
         private System.Windows.Forms.Button moveDownRuleButton;
         private System.Windows.Forms.DataGridView routingGrid;
         private System.Windows.Forms.DataGridViewTextBoxColumn orderColumn;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn enabledColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn applicationsColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn endpointColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn authenticationColumn;
@@ -135,6 +136,7 @@ namespace ProxiFyreUI.Forms
             this.routingTabPage = new System.Windows.Forms.TabPage();
             this.routingGrid = new System.Windows.Forms.DataGridView();
             this.orderColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.enabledColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.applicationsColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.endpointColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.authenticationColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -384,7 +386,7 @@ namespace ProxiFyreUI.Forms
             this.routingGrid.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.routingGrid.BackgroundColor = System.Drawing.SystemColors.Window;
             this.routingGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.routingGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { this.orderColumn, this.applicationsColumn, this.endpointColumn, this.authenticationColumn, this.transportColumn, this.protocolsColumn, this.addressFamiliesColumn, this.warningsColumn });
+            this.routingGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { this.orderColumn, this.enabledColumn, this.applicationsColumn, this.endpointColumn, this.authenticationColumn, this.transportColumn, this.protocolsColumn, this.addressFamiliesColumn, this.warningsColumn });
             this.routingGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.routingGrid.Location = new System.Drawing.Point(8, 47);
             this.routingGrid.MultiSelect = false;
@@ -394,10 +396,12 @@ namespace ProxiFyreUI.Forms
             this.routingGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.routingGrid.Size = new System.Drawing.Size(1090, 432);
             this.routingGrid.TabIndex = 1;
-            this.routingGrid.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.RoutingGrid_CellDoubleClick);
+            this.routingGrid.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.RoutingGrid_CellContentClick);
+            this.routingGrid.CellDoubleClick +=new System.Windows.Forms.DataGridViewCellEventHandler(this.RoutingGrid_CellDoubleClick);
             this.routingGrid.SelectionChanged += new System.EventHandler(this.RoutingGrid_SelectionChanged);
             this.routingGrid.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RoutingGrid_KeyDown);
             this.orderColumn.HeaderText = "Order"; this.orderColumn.Name = "orderColumn"; this.orderColumn.ReadOnly = true; this.orderColumn.Width = 48;
+            this.enabledColumn.HeaderText = "Enabled"; this.enabledColumn.Name = "enabledColumn"; this.enabledColumn.ReadOnly = true; this.enabledColumn.Width = 60;
             this.applicationsColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill; this.applicationsColumn.FillWeight = 130F; this.applicationsColumn.HeaderText = "Applications"; this.applicationsColumn.Name = "applicationsColumn"; this.applicationsColumn.ReadOnly = true;
             this.endpointColumn.HeaderText = "Proxy endpoint"; this.endpointColumn.Name = "endpointColumn"; this.endpointColumn.ReadOnly = true; this.endpointColumn.Width = 145;
             this.authenticationColumn.HeaderText = "Authentication"; this.authenticationColumn.Name = "authenticationColumn"; this.authenticationColumn.ReadOnly = true; this.authenticationColumn.Width = 120;

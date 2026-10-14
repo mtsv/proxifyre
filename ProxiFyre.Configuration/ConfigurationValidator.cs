@@ -60,6 +60,14 @@ namespace ProxiFyre.Configuration
                 ValidateSingleRule(rule, index, issues);
             }
 
+            if (configuration.Proxies.All(rule => rule != null && !rule.Enabled))
+            {
+                issues.Add(Warning(
+                    "ALL_RULES_DISABLED",
+                    "Every proxy rule is disabled; no application traffic will be proxied.",
+                    "proxies"));
+            }
+
             ValidateCatchAllOrdering(configuration.Proxies, issues);
             ValidateApplicationOverlap(configuration.Proxies, issues);
             return new ValidationResult(issues);
@@ -401,14 +409,22 @@ namespace ProxiFyre.Configuration
 
         private static void ValidateCatchAllOrdering(IList<ProxyRule> rules, ICollection<ValidationIssue> issues)
         {
+            // Disabled rules never match traffic, so they neither shadow nor are shadowed.
+            var lastEnabledIndex = -1;
+            for (var index = 0; index < rules.Count; index++)
+            {
+                if (rules[index] != null && rules[index].Enabled)
+                    lastEnabledIndex = index;
+            }
+
             var catchAllRules = new List<int>();
             for (var index = 0; index < rules.Count; index++)
             {
                 var rule = rules[index];
-                if (rule != null && rule.AppNames != null && rule.AppNames.Contains(string.Empty))
+                if (rule != null && rule.Enabled && rule.AppNames != null && rule.AppNames.Contains(string.Empty))
                 {
                     catchAllRules.Add(index);
-                    if (index < rules.Count - 1)
+                    if (index < lastEnabledIndex)
                     {
                         issues.Add(Warning(
                             "CATCH_ALL_NOT_LAST",
@@ -438,7 +454,7 @@ namespace ProxiFyre.Configuration
             for (var ruleIndex = 0; ruleIndex < rules.Count; ruleIndex++)
             {
                 var rule = rules[ruleIndex];
-                if (rule == null || rule.AppNames == null)
+                if (rule == null || !rule.Enabled || rule.AppNames == null)
                     continue;
 
                 var currentRuleMatches = new List<ApplicationMatch>();

@@ -64,6 +64,7 @@ namespace ProxiFyre.Configuration
             var hasCanonicalTransport = TryGetCanonicalTransport(rule.Socks5Transport, out transport);
             return new ProxyRule
             {
+                Enabled = rule.Enabled,
                 AppNames = appNames,
                 Socks5ProxyEndpoint = rule.Socks5ProxyEndpoint == null ? null : rule.Socks5ProxyEndpoint.Trim(),
                 Username = rule.Username,

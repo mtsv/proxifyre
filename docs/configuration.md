@@ -63,6 +63,7 @@ Process ownership lookup is best effort for a standard user. ProxiFyre can route
 
 | Property | Description |
 | --- | --- |
+| `enabled` | When `false`, the rule stays in the file but the service ignores it, and it does not affect catch-all or overlap warnings. Default: `true`. |
 | `appNames` | Application names or paths matched by this rule. An explicit empty string is the catch-all. |
 | `socks5ProxyEndpoint` | SOCKS5 hostname or IPv4 address plus port, for example `proxy.example.com:1080`. |
 | `username`, `password` | Optional SOCKS5 authentication. Configure both or neither. |
